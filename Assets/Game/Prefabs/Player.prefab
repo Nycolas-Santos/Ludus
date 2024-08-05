@@ -2050,6 +2050,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2519754938733107077}
   - component: {fileID: 3672587349629177303}
+  - component: {fileID: 498636046450686548}
   - component: {fileID: 6947115114207685332}
   - component: {fileID: 1969547128096643365}
   - component: {fileID: 2465094147156645512}
@@ -2115,6 +2116,28 @@ MonoBehaviour:
   MovementHandler: {fileID: 2465094147156645512}
   AnimationHandler: {fileID: 1969547128096643365}
   InventoryHandler: {fileID: 6947115114207685332}
+  EquipmentHandler: {fileID: 498636046450686548}
+--- !u!114 &498636046450686548
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4572902705428775069}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d2d1b958a864dad8f32523519f1a3d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  EquippedItems:
+  - ItemData: {fileID: 0}
+    Amount: 0
+  - ItemData: {fileID: 0}
+    Amount: 0
+  - ItemData: {fileID: 0}
+    Amount: 0
+  - ItemData: {fileID: 0}
+    Amount: 0
 --- !u!114 &6947115114207685332
 MonoBehaviour:
   m_ObjectHideFlags: 0

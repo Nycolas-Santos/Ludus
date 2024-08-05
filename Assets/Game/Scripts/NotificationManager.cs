@@ -18,7 +18,7 @@ namespace Game.Scripts
             base.Awake();
             _guiStyle = new GUIStyle
             {
-                fontSize = 36,
+                fontSize = 24,
                 normal =
                 {
                     textColor = Color.white

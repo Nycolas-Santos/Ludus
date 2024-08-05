@@ -1,4 +1,6 @@
 using System;
+using Game.Scripts.Player.Game.Scripts.Equipment;
+using TMPro;
 using UnityEditorInternal.Profiling.Memory.Experimental;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -10,11 +12,15 @@ namespace Game.Scripts.Inventory
     {
         [SerializeField] private Button itemSlotButton;
         [SerializeField] private Image itemIcon;
+        [SerializeField] private TMP_Text equippedText;
         public static event Action<ItemSlotUI> OnSelectSlot;
-        public static event Action<ItemSlotUI> OnChangeItem; 
+        public static event Action<ItemSlotUI> OnChangeItem;
+        public static event Action<ItemSlotUI, ItemSlotUI> OnChangeSlot;
         
 
         public Item CurrentItem;
+        
+        private EquipmentHandler _equipmentHandler => GameManager.Instance.Player.EquipmentHandler;
 
         private void OnEnable()
         {
@@ -33,12 +39,14 @@ namespace Game.Scripts.Inventory
                 CurrentItem = item;
                 itemIcon.sprite = item.ItemData.ItemIcon;
                 itemIcon.color = Color.white;
+                equippedText.gameObject.SetActive(_equipmentHandler.IsItemEquipped(item));
                 OnChangeItem?.Invoke(this);
             }
             else
             {
                 CurrentItem = null;
                 itemIcon.sprite = null;
+                equippedText.gameObject.SetActive(false);
                 itemIcon.color = Color.clear;
             }
         }
@@ -80,6 +88,7 @@ namespace Game.Scripts.Inventory
             var item = itemSlot.CurrentItem;
             itemSlot.Initialize(CurrentItem);
             Initialize(item);
+            OnChangeSlot?.Invoke(itemSlot, this);
         }
     }
 }
