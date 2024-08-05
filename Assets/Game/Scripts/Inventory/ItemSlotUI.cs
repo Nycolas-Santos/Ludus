@@ -2,7 +2,6 @@ using System;
 using Game.Scripts.Extensions;
 using Game.Scripts.Player.Game.Scripts.Equipment;
 using TMPro;
-using UnityEditorInternal.Profiling.Memory.Experimental;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;

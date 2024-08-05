@@ -1,7 +1,5 @@
 using System;
-using UnityEditor.Animations;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Game.Scripts.Player
 {
