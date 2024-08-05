@@ -1,4 +1,5 @@
 using System;
+using Game.Scripts.Extensions;
 using Game.Scripts.Player.Game.Scripts.Equipment;
 using TMPro;
 using UnityEngine;
@@ -17,10 +18,14 @@ namespace Game.Scripts.Inventory
         public ItemSlotUI CurrentSlot;
         
         private EquipmentHandler _equipmentHandler => GameManager.Instance.Player.EquipmentHandler;
+        private InventoryHandler _inventoryHandler => GameManager.Instance.Player.InventoryHandler;
+        
+        public static event Action OnInteractWithItem;
 
         private void Start()
         {
             ItemSlotUI.OnSelectSlot += Initialize;
+            gameObject.SetActive(false);
         }
 
         private void OnDestroy()
@@ -28,9 +33,9 @@ namespace Game.Scripts.Inventory
             ItemSlotUI.OnSelectSlot -= Initialize;
         }
 
-        private void Initialize(ItemSlotUI slot)
+        public void Initialize(ItemSlotUI slot)
         {
-            if (slot.CurrentItem == null)
+            if (slot.CurrentItem is null)
             {
                 CurrentSlot = null;
                 itemNameTMP.text = string.Empty;
@@ -50,7 +55,7 @@ namespace Game.Scripts.Inventory
                 itemDescriptionTMP.text = slot.CurrentItem.ItemData.ItemDescription;
                 itemIconImage.sprite = slot.CurrentItem.ItemData.ItemIcon;
                 ItemSlotUI.OnChangeSlot += OnChangeSlot;
-                InitializeEquipButton(slot);
+                InitializeInteractButton(slot);
                 itemAmountTMP.text = $"x{slot.CurrentItem.Amount}";
             }
         }
@@ -63,31 +68,58 @@ namespace Game.Scripts.Inventory
             }
         }
 
-        private void InitializeEquipButton(ItemSlotUI slot)
+        private void InitializeInteractButton(ItemSlotUI slot)
         {
-            equipButton.gameObject.SetActive(slot.CurrentItem is not null && slot.CurrentItem.ItemData.ItemType == ItemType.Equipment);
-            if (_equipmentHandler.IsItemEquipped(slot.CurrentItem))
+            equipButton.onClick.RemoveAllListeners();
+            switch (slot.CurrentItem.ItemData.ItemType)
             {
-                equipButton.GetComponentInChildren<TMP_Text>().text = "Unequip";
-                equipButton.onClick.RemoveAllListeners();
-                equipButton.onClick.AddListener(() =>
-                {
-                    _equipmentHandler.UnequipItem(slot.CurrentItem.ItemData.EquipmentSettings.EquipmentType);
-                    Initialize(slot);
-                });
+                case ItemType.Generic:
+                    equipButton.gameObject.SetActive(false);
+                    break;
+                case ItemType.Consumable:
+                    equipButton.GetComponentInChildren<TMP_Text>().text = "Use";
+                    equipButton.gameObject.SetActive(true);
+                    equipButton.onClick.AddListener(() =>
+                    {
+                        _inventoryHandler.UseItem(slot.CurrentItem);
+                        slot.CurrentItem = _inventoryHandler.HasItem(slot.CurrentItem) ? slot.CurrentItem : null;
+                        AudioManager.Instance.PlayUISound(Constants.AudioStrings.UI_CONFIRM);
+                        Initialize(slot);
+                        OnInteractWithItem?.Invoke();
+                    });
+                    break;
+                case ItemType.Equipment:
+                    equipButton.gameObject.SetActive(true);
+                    if (_equipmentHandler.IsItemEquipped(slot.CurrentItem))
+                    {
+                        equipButton.GetComponentInChildren<TMP_Text>().text = "Unequip";
+                        equipButton.onClick.RemoveAllListeners();
+                        equipButton.onClick.AddListener(() =>
+                        {
+                            _equipmentHandler.UnequipItem(slot.CurrentItem.ItemData.EquipmentSettings.EquipmentType);
+                            AudioManager.Instance.PlayUISound(Constants.AudioStrings.UI_CONFIRM);
+                            Initialize(slot);
+                            OnInteractWithItem?.Invoke();
+                        });
+                    }
+                    else
+                    {
+                        equipButton.GetComponentInChildren<TMP_Text>().text = "Equip";
+                        equipButton.onClick.RemoveAllListeners();
+                        equipButton.onClick.AddListener(() =>
+                        {
+                            _equipmentHandler.EquipItem(slot.CurrentItem, slot.CurrentItem.ItemData.EquipmentSettings.EquipmentType);
+                            AudioManager.Instance.PlayUISound(Constants.AudioStrings.UI_CONFIRM);
+                            Initialize(slot);
+                            OnInteractWithItem?.Invoke();
+                        });
+                    }
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
-            else
-            {
-                equipButton.GetComponentInChildren<TMP_Text>().text = "Equip";
-                equipButton.onClick.RemoveAllListeners();
-                equipButton.onClick.AddListener(() =>
-                {
-                    _equipmentHandler.EquipItem(slot.CurrentItem, slot.CurrentItem.ItemData.EquipmentSettings.EquipmentType);
-                    Initialize(slot);
-                });
-            }
+            
         }
-
         private void TerminateEquipButton()
         {
             equipButton.gameObject.SetActive(false);

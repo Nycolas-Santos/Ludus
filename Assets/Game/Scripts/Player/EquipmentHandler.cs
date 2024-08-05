@@ -1,5 +1,6 @@
 ﻿using System;
 using Game.Scripts.Inventory;
+using Game.Scripts.Stats;
 
 namespace Game.Scripts.Player
 {
@@ -16,9 +17,11 @@ namespace Game.Scripts.Player
             public static Action OnEquipmentChanged;
             private NotificationManager _notificationManager => NotificationManager.Instance;
             
+            private StatsHandler _statsHandler => GameManager.Instance.Player.StatsHandler;
+            
             public bool IsItemEquipped(Item item)
             {
-                return Array.Exists(EquippedItems, i => i == item);
+                return Array.Exists(EquippedItems, i => i == item && i.GUID == item.GUID);
             }
 
             public bool EquipItem(Item item, EquipmentType type)
@@ -29,7 +32,13 @@ namespace Game.Scripts.Player
                     return false;
                 }
 
+                if (EquippedItems[(int)type] != null)
+                {
+                    OnItemUnequipped?.Invoke(EquippedItems[(int)type]);
+                }
+                
                 EquippedItems[(int)type] = item;
+                
                 _notificationManager.AddNotification($"Equipped: {item.ItemData.ItemName} to {type}");
                 OnItemEquipped?.Invoke(item);
                 OnEquipmentChanged?.Invoke();

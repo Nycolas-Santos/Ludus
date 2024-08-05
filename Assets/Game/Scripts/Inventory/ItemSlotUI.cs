@@ -1,4 +1,5 @@
 using System;
+using Game.Scripts.Extensions;
 using Game.Scripts.Player.Game.Scripts.Equipment;
 using TMPro;
 using UnityEditorInternal.Profiling.Memory.Experimental;
@@ -8,28 +9,44 @@ using UnityEngine.UI;
 
 namespace Game.Scripts.Inventory
 {
-    public class ItemSlotUI : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler, IDropHandler
+    public class ItemSlotUI : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler, IDropHandler, IPointerEnterHandler
     {
         [SerializeField] private Button itemSlotButton;
         [SerializeField] private Image itemIcon;
         [SerializeField] private TMP_Text equippedText;
         public static event Action<ItemSlotUI> OnSelectSlot;
-        public static event Action<ItemSlotUI> OnChangeItem;
         public static event Action<ItemSlotUI, ItemSlotUI> OnChangeSlot;
         
 
         public Item CurrentItem;
         
         private EquipmentHandler _equipmentHandler => GameManager.Instance.Player.EquipmentHandler;
+        private InventoryHandler _inventoryHandler => GameManager.Instance.Player.InventoryHandler;
+
+        private void Start()
+        {
+            EquipmentHandler.OnItemEquipped += item => { Initialize(CurrentItem); };
+            EquipmentHandler.OnItemUnequipped += item => { Initialize(CurrentItem); };
+            InventoryHandler.OnAddItem += item => { if (CurrentItem == item) { Initialize(item); } };
+            InventoryHandler.OnRemoveItem += item => { if (CurrentItem == item) { Initialize(null); } };
+        }
 
         private void OnEnable()
         {
-            itemSlotButton.onClick.AddListener( () => OnSelectSlot?.Invoke(this));
+            itemSlotButton.onClick.AddListener( () =>
+            {
+                AudioManager.Instance.PlayUISound(Constants.AudioStrings.UI_CONFIRM);
+                OnSelectSlot?.Invoke(this);
+            });
         }
 
         private void OnDisable()
         {
-            itemSlotButton.onClick.RemoveListener(() => OnSelectSlot?.Invoke(this));
+            itemSlotButton.onClick.RemoveListener(() =>
+            {
+                AudioManager.Instance.PlayUISound(Constants.AudioStrings.UI_CONFIRM);
+                OnSelectSlot?.Invoke(this);
+            });
         }
 
         public void Initialize(Item item)
@@ -40,7 +57,6 @@ namespace Game.Scripts.Inventory
                 itemIcon.sprite = item.ItemData.ItemIcon;
                 itemIcon.color = Color.white;
                 equippedText.gameObject.SetActive(_equipmentHandler.IsItemEquipped(item));
-                OnChangeItem?.Invoke(this);
             }
             else
             {
@@ -61,11 +77,13 @@ namespace Game.Scripts.Inventory
         {
             itemIcon.transform.SetParent(itemIcon.transform.parent.parent.parent);
             itemIcon.transform.SetAsLastSibling();
+            AudioManager.Instance.PlayUISound(Constants.AudioStrings.UI_SELECT);
         }
 
         public void OnEndDrag(PointerEventData eventData)
         {
             ResetIconToDefaultPosition();
+            AudioManager.Instance.PlayUISound(Constants.AudioStrings.UI_SELECT);
         }
 
         public void OnDrag(PointerEventData eventData)
@@ -89,6 +107,12 @@ namespace Game.Scripts.Inventory
             itemSlot.Initialize(CurrentItem);
             Initialize(item);
             OnChangeSlot?.Invoke(itemSlot, this);
+        }
+
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            if (CurrentItem?.ItemData is null) return;
+            AudioManager.Instance.PlayUISound(Constants.AudioStrings.UI_SELECT);
         }
     }
 }

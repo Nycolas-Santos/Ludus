@@ -1,4 +1,5 @@
-﻿using Game.Scripts.Inventory;
+﻿using Game.Scripts.Extensions;
+using Game.Scripts.Inventory;
 using UnityEngine;
 
 namespace Game.Scripts.Interaction
@@ -11,6 +12,7 @@ namespace Game.Scripts.Interaction
         {
            Debug.Log("Cash Collected: " + Amount);
            _inventoryHandler.AddCash(Amount);
+           AudioManager.Instance.PlayUISound(Constants.AudioStrings.UI_CASH);
            Destroy(gameObject);
         }
     }

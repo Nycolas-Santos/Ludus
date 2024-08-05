@@ -2050,6 +2050,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2519754938733107077}
   - component: {fileID: 3672587349629177303}
+  - component: {fileID: 4095087088168409582}
   - component: {fileID: 498636046450686548}
   - component: {fileID: 6947115114207685332}
   - component: {fileID: 1969547128096643365}
@@ -2117,6 +2118,26 @@ MonoBehaviour:
   AnimationHandler: {fileID: 1969547128096643365}
   InventoryHandler: {fileID: 6947115114207685332}
   EquipmentHandler: {fileID: 498636046450686548}
+  StatsHandler: {fileID: 4095087088168409582}
+--- !u!114 &4095087088168409582
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4572902705428775069}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f72dc4513ca246148b14e2cb309c3d58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  statList:
+  - Name: MaxHealth
+    Value: 100
+  - Name: Armor
+    Value: 5
+  - Name: Damage
+    Value: 5
 --- !u!114 &498636046450686548
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2132,12 +2153,16 @@ MonoBehaviour:
   EquippedItems:
   - ItemData: {fileID: 0}
     Amount: 0
+    guid: 
   - ItemData: {fileID: 0}
     Amount: 0
+    guid: 
   - ItemData: {fileID: 0}
     Amount: 0
+    guid: 
   - ItemData: {fileID: 0}
     Amount: 0
+    guid: 
 --- !u!114 &6947115114207685332
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2153,28 +2178,40 @@ MonoBehaviour:
   Items:
   - ItemData: {fileID: 0}
     Amount: 0
+    guid: 
   - ItemData: {fileID: 0}
     Amount: 0
+    guid: 
   - ItemData: {fileID: 0}
     Amount: 0
+    guid: 
   - ItemData: {fileID: 0}
     Amount: 0
+    guid: 
   - ItemData: {fileID: 0}
     Amount: 0
+    guid: 
   - ItemData: {fileID: 0}
     Amount: 0
+    guid: 
   - ItemData: {fileID: 0}
     Amount: 0
+    guid: 
   - ItemData: {fileID: 0}
     Amount: 0
+    guid: 
   - ItemData: {fileID: 0}
     Amount: 0
+    guid: 
   - ItemData: {fileID: 0}
     Amount: 0
+    guid: 
   - ItemData: {fileID: 0}
     Amount: 0
+    guid: 
   - ItemData: {fileID: 0}
     Amount: 0
+    guid: 
   Cash: 0
 --- !u!114 &1969547128096643365
 MonoBehaviour:

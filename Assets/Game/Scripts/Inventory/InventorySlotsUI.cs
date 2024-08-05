@@ -10,23 +10,39 @@ namespace Game.Scripts.Inventory
     {
         [SerializeField] private List<ItemSlotUI> itemSlots;
         
-        private ItemSlotUI _currentSelectedSlot;
+        public ItemSlotUI CurrentSelectedSlot;
         
         private InventoryHandler _inventory => GameManager.Instance.Player.InventoryHandler;
 
         private void OnEnable()
         {
             ItemSlotUI.OnSelectSlot += SetCurrentSelectedSlot;
-            ItemSlotUI.OnChangeItem += UpdateInventoryHandler;
+            InventoryInfoUI.OnInteractWithItem += UpdateInventoryHandler;
+            ItemSlotUI.OnChangeSlot += UpdateInventoryHandler;
         }
 
         private void OnDisable()
         {
             ItemSlotUI.OnSelectSlot -= SetCurrentSelectedSlot;
-            ItemSlotUI.OnChangeItem -= UpdateInventoryHandler;
+            InventoryInfoUI.OnInteractWithItem -= UpdateInventoryHandler;
+            ItemSlotUI.OnChangeSlot -= UpdateInventoryHandler;
         }
         
-        private void UpdateInventoryHandler(ItemSlotUI itemSlotUI)
+        public void UpdateSlots(Item[] items)
+        {
+            for (var i = 0; i < itemSlots.Count; i++)
+            {
+                itemSlots[i].Initialize(items.ElementAtOrDefault(i));
+            }
+        }
+        
+        public void UpdateInventoryHandler()
+        {
+            var newItemPositions = itemSlots.Select(slot => slot.CurrentItem).ToList();
+            _inventory.Items = newItemPositions.ToArray();
+        }
+        
+        public void UpdateInventoryHandler(ItemSlotUI slot1, ItemSlotUI slot2)
         {
             var newItemPositions = itemSlots.Select(slot => slot.CurrentItem).ToList();
             _inventory.Items = newItemPositions.ToArray();
@@ -34,7 +50,7 @@ namespace Game.Scripts.Inventory
         
         private void SetCurrentSelectedSlot(ItemSlotUI slot)
         {
-            _currentSelectedSlot = slot;
+            CurrentSelectedSlot = slot;
         }
 
         public void Initialize(Item[] items)

@@ -1,4 +1,5 @@
 ﻿using System;
+using Game.Scripts.Stats;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -19,6 +20,7 @@ namespace Game.Scripts.Inventory
     public struct EquipmentSettings
     {
         public EquipmentType EquipmentType;
+        public Stat Stat;
     }
     
     public enum EquipmentType

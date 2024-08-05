@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Game.Scripts.Interaction;
 using Unity.Collections;
 using UnityEngine;
 
@@ -9,9 +10,13 @@ namespace Game.Scripts.Inventory
     {
         public Item[] Items;
         [ReadOnly] public int Cash;
+        [SerializeField] private ItemInteraction _itemDropPrefab;
         
         private UIManager _uiManager => UIManager.Instance;
         private NotificationManager _notificationManager => NotificationManager.Instance;
+        
+        public static Action<Item> OnAddItem;
+        public static Action<Item> OnRemoveItem;
 
         private void Update()
         {
@@ -47,31 +52,16 @@ namespace Game.Scripts.Inventory
                 return false;
             }
 
+            var emptyIndex = Array.FindIndex(Items, i => i?.ItemData is null);
+
             if (item.ItemData.Stackable)
             {
-                var index = Array.FindIndex(Items, i => i is { ItemData: not null } && i.ItemData.ItemName == item.ItemData.ItemName);
+                var index = Array.FindIndex(Items, i => i?.ItemData?.ItemName == item.ItemData.ItemName);
                 if (index >= 0)
                 {
                     Items[index].Amount += item.Amount;
                 }
-                else
-                {
-                    var emptyIndex = Array.FindIndex(Items, i => i.ItemData is null);
-                    if (emptyIndex >= 0)
-                    {
-                        Items[emptyIndex] = item;
-                    }
-                    else
-                    {
-                        _notificationManager.AddNotification("Inventory is full");
-                        return false;
-                    }
-                }
-            }
-            else
-            {
-                var emptyIndex = Array.FindIndex(Items, i => i.ItemData is null);
-                if (emptyIndex >= 0)
+                else if (emptyIndex >= 0)
                 {
                     Items[emptyIndex] = item;
                 }
@@ -81,15 +71,62 @@ namespace Game.Scripts.Inventory
                     return false;
                 }
             }
-
+            else if (emptyIndex >= 0)
+            {
+                Items[emptyIndex] = item;
+            }
+            else
+            {
+                _notificationManager.AddNotification("Inventory is full");
+                return false;
+            }
+            OnAddItem?.Invoke(item);
             _notificationManager.AddNotification($"Collected: {item.ItemData.ItemName}");
             return true;
         }
-        
-        public void RemoveItem(Item item)
+
+        private void RemoveItem(Item item)
         {
-            Items[Array.FindIndex(Items, i => i == item)] = null;
-            _notificationManager.AddNotification($"Removed: {item.ItemData.ItemName}");
+            if (item == null || item.ItemData == null)
+            {
+                _notificationManager.AddNotification("Invalid item");
+                return;
+            }
+
+            var index = Array.FindIndex(Items, i => i != null && i == item);
+            if (index >= 0)
+            {
+                Items[index] = null;
+                OnRemoveItem?.Invoke(item);
+                _notificationManager.AddNotification($"Removed: {item.ItemData.ItemName}");
+            }
+            else
+            {
+                _notificationManager.AddNotification("Item not found in inventory");
+            }
+            
+        }
+        
+        public void UseItem(Item item)
+        {
+            if (item?.ItemData is null)
+            {
+                _notificationManager.AddNotification("Invalid item");
+                return;
+            }
+
+            if (item.ItemData.Stackable)
+            {
+                item.Amount--;
+                if (item.Amount <= 0)
+                {
+                    RemoveItem(item);
+                }
+            }
+            else
+            {
+                RemoveItem(item);
+            }
         }
         
         public void AddCash(int amount)
@@ -107,6 +144,11 @@ namespace Game.Scripts.Inventory
         public void SetCash(int amount)
         {
             Cash = amount;
+        }
+        
+        public bool HasItem(Item item)
+        {
+            return Array.Exists(Items, i => i == item);
         }
     }
 }

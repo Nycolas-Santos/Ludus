@@ -378,6 +378,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemSlotButton: {fileID: 7033139217056927425}
   itemIcon: {fileID: 2016292687733164009}
+  equippedText: {fileID: 4887566683230991088}
   CurrentItem:
     ItemData: {fileID: 0}
     Amount: 0

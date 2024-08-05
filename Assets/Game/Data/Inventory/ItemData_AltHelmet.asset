@@ -10,9 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 516113aca2c24bf499bff2d98665e9cb, type: 3}
-  m_Name: ItemData
+  m_Name: ItemData_AltHelmet
   m_EditorClassIdentifier: 
-  ItemName: DebugItem
-  ItemDescription: Description
+  ItemName: Civilian Helmet
+  ItemDescription: Civilian Helmet
   Stackable: 0
-  ItemIcon: {fileID: 21300000, guid: bdf830f285f6f4765acba4e546f65f15, type: 3}
+  ItemIcon: {fileID: 21300000, guid: 7f79c75a53c664695bfec9c5e637d61a, type: 3}
+  ItemType: 2
+  EquipmentSettings:
+    EquipmentType: 0
+    Stat:
+      Name: Armor
+      Value: 5
